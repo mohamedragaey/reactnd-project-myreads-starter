@@ -14,29 +14,21 @@ class SearchPage extends Component {
   syncBooks(queryBooks) {
     return (
       queryBooks.map(book => {
-
-        // Check if book matches any on main page
         const myBook = this.props.books.find(item => item.id === book.id)
-
-        // Match found
         if (myBook) {
-          book['shelf'] = myBook.shelf // Add shelf propery to match main page value
+          book['shelf'] = myBook.shelf
         }
-
-        return book  // Push book into results
+        return book
       })
     )
   }
 
   newQuery(books) {
-
-    // Defined results in array format
     if (books && Array.isArray(books)) {
-
       const syncedBooks = this.syncBooks(books)
-      this.setState({books: syncedBooks})     // Change state to results
+      this.setState({books: syncedBooks})
     } else {
-      this.setState({books: []}) // Clear state
+      this.setState({books: []})
     }
   }
 

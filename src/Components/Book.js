@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
 import ShelfSelector from "./ShelfSelector"
 import BookCover from "./BookCover"
 
@@ -13,10 +12,6 @@ class Book extends Component {
 
   static defaultProps = {
     imageLinks: {thumbnail: 'http://i.imgur.com/J5LVHEL.jpg'}
-  }
-  static propTypes = {
-    imageLinks: PropTypes.objectOf(PropTypes.string).isRequired,
-    book: PropTypes.object.isRequired
   }
 
 

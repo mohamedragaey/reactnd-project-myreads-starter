@@ -13,20 +13,15 @@ class SearchBar extends Component {
   }
 
   componentDidUpdate(_, prevState) {
-    // Input value changed and it is not empty
     if (prevState.query !== this.state.query && this.state.query !== '') {
-
       this.setState({typing: true})
-      // Use API to search for value
       BooksAPI.search(this.state.query)
         .then(results => (this.props.newQuery(results)))
         .catch()
     }
-
-    // Input value changed and is empty
     if (prevState.query !== this.state.query && this.state.query === '') {
-      this.setState({typing: false})                         // Hide clear button
-      this.props.newQuery(null)                              // Push up nothing to clear
+      this.setState({typing: false})
+      this.props.newQuery(null)
     }
   }
 

@@ -21,7 +21,6 @@ function BookShelf(props) {
   )
 }
 
-// Set default values for properties
 BookShelf.defaultProps = {
   shelves: [
     {title: "Currently Reading", books: []},
@@ -32,7 +31,6 @@ BookShelf.defaultProps = {
   }
 }
 
-// Set types for properties
 BookShelf.propTypes = {
   shelves: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.string.isRequired,
