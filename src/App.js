@@ -1,9 +1,8 @@
 import React, {Component} from 'react'
 import * as BooksAPI from './BooksAPI'
 import {Route} from 'react-router-dom'
-import Book from './Components/Book'
-import SearchButton from './Components/SearchButton'
 import SearchPage from './Components/SearchPage'
+import BookShelf from "./Components/BookShelf"
 import './App.css'
 
 class BooksApp extends Component {
@@ -16,65 +15,76 @@ class BooksApp extends Component {
     BooksAPI.getAll()
       .then((books) => {
         this.setState(() => ({books}))
-        console.log(books)
       })
   }
 
+  componentDidUpdate(_, prevState) {
+    if (prevState.books.length !== this.state.books.length) {
+      BooksAPI.getAll()
+        .then(books => this.setState({books}))
+    }
+  }
+
+  changeShelf(changeBook, newValue) {
+    BooksAPI.update(changeBook, newValue)
+
+    // Update state
+    this.setState(prevState => {
+      let books = []
+      // Book to change was not in the previous state
+      if (!prevState.books.includes(changeBook)) {
+        changeBook['shelf'] = newValue
+        books.concat(prevState.books).push(changeBook)
+      }
+      else {
+        books = prevState.books.map(book => {
+          if (book === changeBook) {
+            book.shelf = newValue
+            return book
+          }
+          else {
+            return book
+          }
+        })
+      }
+      return {books}
+    })
+
+  }
+
+  putBooksOnShelf(books) {
+
+    //Separate the books by shelf listed
+    const booksReading = books.filter(book => book.shelf === 'currentlyReading')
+    const booksWant = books.filter(book => book.shelf === 'wantToRead')
+    const booksRead = books.filter(book => book.shelf === 'read')
+
+
+    return [
+      {
+        title: 'Currently Reading',
+        books: booksReading
+      },
+      {
+        title: 'Want to Read',
+        books: booksWant
+      },
+      {
+        title: 'Read',
+        books: booksRead
+      }
+    ]
+  }
+
   render() {
-    let {books} = this.state
+    let shelves = this.putBooksOnShelf(this.state.books)
     return (
       <div className="app">
-        <Route exact path='/' render={() => (<div className="list-books">
-          <div className="list-books-title">
-            <h1>My Reads</h1>
-          </div>
-          <div className="list-books-content">
-            <div>
-              <div className="bookshelf">
-                <h2 className="bookshelf-title">Currently Reading</h2>
-                <div className="bookshelf-books">
-                  <ol className="books-grid">
-                    {books.map(book => (
-                      <Book
-                        key={book.id}
-                        book={book}
-                      />
-                    ))}
-                  </ol>
-
-                </div>
-              </div>
-              <div className="bookshelf">
-                <h2 className="bookshelf-title">Want to Read</h2>
-                <div className="bookshelf-books">
-                  <ol className="books-grid">
-                    {books.map(book => (
-                      <Book
-                        key={book.id}
-                        book={book}
-                      />
-                    ))}
-                  </ol>
-                </div>
-              </div>
-              <div className="bookshelf">
-                <h2 className="bookshelf-title">Read</h2>
-                <div className="bookshelf-books">
-                  <ol className="books-grid">
-                    {books.map(book => (
-                      <Book
-                        key={book.id}
-                        book={book}
-                      />
-                    ))}
-                  </ol>
-                </div>
-              </div>
-            </div>
-          </div>
-          <SearchButton/>
-        </div>)}/>
-        <Route path='/search' render={() => (<SearchPage/>)}/>
+        <Route exact path='/' render={() => (<BookShelf shelves={shelves}
+                                                        changeShelf={(changeBook, newValue) => (this.changeShelf(changeBook, newValue))}/>)}/>
+        <Route path='/search' render={() => (<SearchPage books={this.state.books} changeShelf={
+          (changeBook, newValue) => (this.changeShelf(changeBook, newValue))
+        }/>)}/>
       </div>
     )
   }

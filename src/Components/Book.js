@@ -1,29 +1,49 @@
-import React from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
+import ShelfSelector from "./ShelfSelector"
+import BookCover from "./BookCover"
 
-function Book(props) {
-  let {title, authors, imageLinks} = props.book
-  return (
-    <li>
-      <div className="book">
-        <div className="book-top">
-          <div className="book-cover">
-            <img src={imageLinks.thumbnail} alt={title}/>
+class Book extends Component {
+  constructor(props) {
+    super()
+    this.state = {
+      shelf: props.book.shelf
+    }
+  }
+
+  static defaultProps = {
+    imageLinks: {thumbnail: 'http://i.imgur.com/J5LVHEL.jpg'}
+  }
+  static propTypes = {
+    imageLinks: PropTypes.objectOf(PropTypes.string).isRequired,
+    book: PropTypes.object.isRequired
+  }
+
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.shelf !== this.state.shelf) {
+      const changeBook = this.props.book
+      const shelf = this.state.shelf
+      this.props.changeShelf(changeBook, shelf)
+    }
+  }
+
+  render() {
+    const book = this.props.book
+    const {title, authors, imageLinks} = book
+    return (
+      <li>
+        <div className="book">
+          <div className="book-top">
+            <BookCover imageLinks={imageLinks} book={book}/>
+            <ShelfSelector shelf={this.state.shelf} changed={value => this.setState({shelf: value})}/>
           </div>
-          <div className="book-shelf-changer">
-            <select>
-              <option value="move" disabled>Move to...</option>
-              <option value="currentlyReading">Currently Reading</option>
-              <option value="wantToRead">Want to Read</option>
-              <option value="read">Read</option>
-              <option value="none">None</option>
-            </select>
-          </div>
+          <div className="book-title">{title}</div>
+          <div className="book-authors">{authors}</div>
         </div>
-        <div className="book-title">{title}</div>
-        <div className="book-authors">{authors}</div>
-      </div>
-    </li>
-  )
+      </li>
+    )
+  }
 }
 
 export default Book
