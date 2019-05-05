@@ -202,3 +202,10 @@ body, .app {
     text-align: center;
     font-size: 0.8em;
 }
+
+.no-match {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}

@@ -1,8 +1,9 @@
 import React, {Component} from 'react'
 import * as BooksAPI from './BooksAPI'
-import {Route} from 'react-router-dom'
+import {Route, Switch} from 'react-router-dom'
 import SearchPage from './Components/SearchPage'
 import BookShelf from "./Components/BookShelf"
+import NoMatch from './Components/NoMatch'
 import './App.css'
 
 class BooksApp extends Component {
@@ -27,28 +28,26 @@ class BooksApp extends Component {
 
   changeShelf(changeBook, newValue) {
     BooksAPI.update(changeBook, newValue)
-
-    // Update state
-    this.setState(prevState => {
-      let books = []
-      // Book to change was not in the previous state
-      if (!prevState.books.includes(changeBook)) {
-        changeBook['shelf'] = newValue
-        books.concat(prevState.books).push(changeBook)
-      }
-      else {
-        books = prevState.books.map(book => {
-          if (book === changeBook) {
-            book.shelf = newValue
-            return book
+      .then(
+        // Update state
+        this.setState(prevState => {
+          let books = []
+          // Book to change was not in the previous state
+          if (!prevState.books.includes(changeBook)) {
+            changeBook['shelf'] = newValue
+            books.concat(prevState.books).push(changeBook)
+          } else {
+            books = prevState.books.map(book => {
+              if (book === changeBook) {
+                book.shelf = newValue
+                return book
+              } else {
+                return book
+              }
+            })
           }
-          else {
-            return book
-          }
-        })
-      }
-      return {books}
-    })
+          return {books}
+        }))
 
   }
 
@@ -80,11 +79,15 @@ class BooksApp extends Component {
     let shelves = this.putBooksOnShelf(this.state.books)
     return (
       <div className="app">
-        <Route exact path='/' render={() => (<BookShelf shelves={shelves}
-                                                        changeShelf={(changeBook, newValue) => (this.changeShelf(changeBook, newValue))}/>)}/>
-        <Route path='/search' render={() => (<SearchPage books={this.state.books} changeShelf={
-          (changeBook, newValue) => (this.changeShelf(changeBook, newValue))
-        }/>)}/>
+        <Switch>
+          <Route exact path='/' render={() => (<BookShelf shelves={shelves}
+                                                          changeShelf={(changeBook, newValue) => (this.changeShelf(changeBook, newValue))}/>)}/>
+          <Route path='/search' render={() => (<SearchPage books={this.state.books} changeShelf={
+            (changeBook, newValue) => (this.changeShelf(changeBook, newValue))
+          }/>)}/>
+          <Route component={NoMatch}/>
+        </Switch>
+
       </div>
     )
   }
